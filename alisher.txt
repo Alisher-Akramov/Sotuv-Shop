@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sotuv Shop</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #f0f2f5; }
+    header { background: #007bff; color: white; padding: 20px; text-align: center; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 10px 10px 0 0; }
+    .language-selector { position: absolute; top: 20px; right: 20px; background: #fff; padding: 5px; border-radius: 5px; }
+    .container { max-width: 1100px; margin: auto; padding: 30px 20px; border-radius: 12px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .post-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 25px; }
+    .post { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s ease; }
+    .post:hover { transform: translateY(-5px); }
+    .post img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+    .post h3 { margin: 10px 0 5px; font-size: 1.1rem; }
+    .post p { margin: 5px 0; color: #444; }
+    .post span { font-weight: bold; color: #28a745; }
+    .add-post-btn { display: block; margin: 20px auto 30px; padding: 12px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s ease; }
+    .add-post-btn:hover { background: #218838; }
+    #addForm { display: none; margin-bottom: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    #addForm input, #addForm textarea, #addForm input[type="file"] { width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    #addForm button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    #addForm button:hover { background: #0069d9; }
+
+    /* O'chirish tugmasi */
+    .delete-btn {
+      background-color: #dc3545; /* Qizil rang */
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px; /* Yumaloq burchaklar */
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .delete-btn:hover {
+      background-color: #c82333; /* Qizil rangni o'zgartirish hover bo'lganda */
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="siteTitle">Sotuv Shop</h1>
+    <div class="language-selector">
+      <select id="language" onchange="changeLanguage()">
+        <option value="uz">O‘zbekcha</option>
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="container">
+    <button class="add-post-btn" onclick="toggleForm()">➕ Eʼlon qoʻshish</button>
+
+    <div id="addForm">
+      <input type="text" id="title" placeholder="Mahsulot nomi">
+      <input type="text" id="price" placeholder="Narxi (so‘m)">
+      <textarea id="desc" placeholder="Mahsulot tavsifi"></textarea>
+      <input type="file" id="imgUpload" accept="image/*">
+      <button onclick="addPost()">Qoʻshish</button>
+    </div>
+
+    <div class="post-list" id="postList">
+      <!-- E'lonlar bu yerda ko'rsatiladi -->
+    </div>
+  </div>
+
+  <script>
+    // Tilni o'zgartirish
+    const translations = {
+      uz: {
+        title: "Sotuv Shop",
+        placeholderTitle: "Mahsulot nomi",
+        placeholderPrice: "Narxi (so‘m)",
+        placeholderDesc: "Mahsulot tavsifi",
+        addBtnText: "Qoʻshish",
+        addPostText: "➕ Eʼlon qoʻshish"
+      },
+      ru: {
+        title: "Магазин объявлений Сотув",
+        placeholderTitle: "Название товара",
+        placeholderPrice: "Цена (сум)",
+        placeholderDesc: "Описание товара",
+        addBtnText: "Добавить",
+        addPostText: "➕ Добавить объявление"
+      },
+      en: {
+        title: "Sotuv Shop",
+        placeholderTitle: "Product Name",
+        placeholderPrice: "Price (in som)",
+        placeholderDesc: "Product Description",
+        addBtnText: "Add",
+        addPostText: "➕ Add Post"
+      }
+    };
+
+    // Tilni o'zgartirish funksiyasi
+    function changeLanguage() {
+      const lang = document.getElementById('language').value;
+      const t = translations[lang];
+
+      document.getElementById('siteTitle').innerText = t.title;
+      document.getElementById('title').placeholder = t.placeholderTitle;
+      document.getElementById('price').placeholder = t.placeholderPrice;
+      document.getElementById('desc').placeholder = t.placeholderDesc;
+      document.querySelector('.add-post-btn').innerText = t.addPostText;
+      document.querySelector('#addForm button').innerText = t.addBtnText;
+    }
+
+    function toggleForm() {
+      const form = document.getElementById('addForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function addPost() {
+      const title = document.getElementById('title').value;
+      const price = document.getElementById('price').value;
+      const desc = document.getElementById('desc').value;
+      const imgUpload = document.getElementById('imgUpload');
+      const imgFile = imgUpload.files[0];
+
+      if (!title || !price || !desc) {
+        alert('Iltimos, barcha maydonlarni toʻldiring!');
+        return;
+      }
+
+      // Rasmni yuklab olish
+      let imgUrl = 'https://via.placeholder.com/300x180'; // default image URL
+      if (imgFile) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          imgUrl = reader.result; // Rasmni base64 formatida saqlaymiz
+          createPost(title, price, desc, imgUrl);
+        };
+        reader.readAsDataURL(imgFile); // rasmni base64 formatida o'qish
+      } else {
+        createPost(title, price, desc, imgUrl);
+      }
+    }
+
+    function createPost(title, price, desc, imgUrl) {
+      // E'lon yaratish va ko'rsatish
+      const id = new Date().getTime(); // Unique ID: vaqt bo'yicha
+      const newPost = { id, title, price, desc, imgUrl };
+
+      // LocalStorage'da saqlash
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.push(newPost);
+      localStorage.setItem('posts', JSON.stringify(posts));
+
+      renderPosts(); // Yangi e'lonni ko'rsatish
+      resetForm();
+      toggleForm();
+    }
+
+    function renderPosts() {
+      const postList = document.getElementById('postList');
+      postList.innerHTML = ''; // Avvalgi e'lonlarni o'chirib tashlash
+
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+          <img src="${post.imgUrl}" alt="Eʼlon rasmi">
+          <h3>${post.title}</h3>
+          <p>Narxi: <span>${post.price} so‘m</span></p>
+          <p>${post.desc}</p>
+          <button class="delete-btn" onclick="deletePost(${post.id})">O'chirish</button>
+        `;
+        postList.appendChild(postElement);
+      });
+    }
+
+    function deletePost(id) {
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      const updatedPosts = posts.filter(post => post.id !== id);
+      localStorage.setItem('posts', JSON.stringify(updatedPosts));
+      renderPosts(); // E'lonlarni yangilash
+    }
+
+    function resetForm() {
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('desc').value = '';
+      document.getElementById('imgUpload').value = '';
+    }
+
+    // Sayt yuklanganda barcha e'lonlarni ko'rsatish
+    renderPosts();
+  </script>
+</body>
+</html>
